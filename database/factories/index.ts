@@ -10,7 +10,7 @@ import User from 'App/Models/User'
 
 export const UserFactory = Factory.define(User, ({ faker }) => {
   return {
-    username: faker.name.findName(),
+    username: faker.name.firstName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
     imageUrl: faker.internet.url(),

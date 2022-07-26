@@ -18,6 +18,11 @@ Route.post('/favorite/:recipeId', 'FavoritesController.favorite')
 Route.post('/unfavorite/:recipeId', 'FavoritesController.unFavorite')
 Route.get('/favorites', 'FavoritesController.index')
 
+// SEARCH
+Route.get('/search-user/:searchString', 'SearchesController.searchUsers')
+Route.get('/search-recipe/:searchString', 'SearchesController.searchRecipes')
+Route.get('/search-recipe', 'SearchesController.searchRecipesByIngredients')
+
 // RECIPES
 Route.post('/recipes', 'RecipesController.store')
 Route.get('/recipes/:id', 'RecipesController.show')
@@ -29,6 +34,6 @@ Route.post('/recipes/:id/comment', 'CommentsController.store')
 Route.put('/recipes/:id/comment/:commentId', 'CommentsController.update')
 Route.post('/recipes/:id/comment/:commentId/like', 'CommentsController.like')
 
-// SEGUIDORES
+// FOLLOWERS
 Route.post('/follow', 'UnfollowsController.follow').middleware('auth')
 Route.post('/unfollow', 'UnfollowsController.unFollow').middleware('auth')

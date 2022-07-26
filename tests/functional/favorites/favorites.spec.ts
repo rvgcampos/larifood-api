@@ -139,7 +139,7 @@ test.group('User', (group) => {
     })
 
     console.log(JSON.stringify(response.body(), null, 4))
-  }).pin()
+  })
 
   group.setup(async () => {
     const client = new ApiClient()
