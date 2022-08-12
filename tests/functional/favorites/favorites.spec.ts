@@ -1,5 +1,6 @@
 import {
   CategoryFactory,
+  FavoritesFolderFactory,
   PrepareTimeUnitFactory,
   QtdUnitFactory,
   UserFactory,
@@ -139,6 +140,46 @@ test.group('User', (group) => {
     })
 
     console.log(JSON.stringify(response.body(), null, 4))
+  })
+
+  // POR PASTAS
+  test('it should favorite an recipe in a folder', async ({ client }) => {
+    const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
+    const category1 = await CategoryFactory.create()
+    const qtdUnit1 = await QtdUnitFactory.merge({ name: 'KG' }).create()
+    const favoriteFolder = await FavoritesFolderFactory.merge({ userId: user.id }).create()
+
+    // const user1 = await UserFactory.create()
+
+    const recipePayload1 = {
+      name: 'Brownie',
+      prepareTime: 2,
+      userId: user.id,
+      prepareTimeUnitId: prepareTimeUnit1.id,
+      categoryId: category1.id,
+      ingredients: [
+        { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit1.id },
+        { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
+      ],
+      prepareModes: [
+        {
+          description: 'Faça isso - 1',
+        },
+        {
+          description: 'Faça isso - 2',
+        },
+      ],
+    }
+    const recipe1 = await client.post('/recipes').json(recipePayload1)
+
+    const favorite = await client
+      .post(`/favorite/${recipe1.body().recipe.id}`)
+      .headers({
+        Authorization: `Bearer ${token}`,
+      })
+      .json({ favoriteFolderId: favoriteFolder.id })
+
+    console.log(JSON.stringify(favorite.body()), null, 4)
   })
 
   group.setup(async () => {

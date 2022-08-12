@@ -14,98 +14,14 @@ let user = {} as User
 test.group('User', (group) => {
   group.each.setup(async () => {
     await Database.beginGlobalTransaction()
-    return () => Database.rollbackGlobalTransaction()
+    // return () => Database.rollbackGlobalTransaction()
   })
 
-  test('it should return a list of recipes', async ({ client }) => {
-    const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
-    const category1 = await CategoryFactory.create()
-    const qtdUnit1 = await QtdUnitFactory.merge({ name: 'KG' }).create()
-
-    const recipePayload1 = {
-      name: 'Brownie',
-      prepareTime: 2,
-      userId: user.id,
-      prepareTimeUnitId: prepareTimeUnit1.id,
-      categoryId: category1.id,
-      ingredients: [
-        { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit1.id },
-        { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
-      ],
-      prepareModes: [
-        {
-          description: 'Faça isso - 1',
-        },
-        {
-          description: 'Faça isso - 2',
-        },
-      ],
-    }
-    await client.post('/recipes').json(recipePayload1)
-    await client.post('/recipes').json({ ...recipePayload1, name: 'Brownie 2' })
-    await client.post('/recipes').json({ ...recipePayload1, name: 'Frango' })
-
-    const response = await client.get('/search-recipe/brownie')
-    console.log(JSON.stringify(response.body(), null, 4))
+  group.each.teardown(async () => {
+    await Database.rollbackGlobalTransaction()
   })
 
-  test('it should return a list of users', async ({ client }) => {
-    const user1 = await UserFactory.create()
-    const user2 = await UserFactory.create()
-    const user3 = await UserFactory.create()
-
-    const response = await client.get(`/search-user/${user1.username}`)
-    console.log(JSON.stringify(response.body(), null, 4))
-  })
-
-  test('it should return a list of recipes by ingredients', async ({ client }) => {
-    const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
-    const category1 = await CategoryFactory.create()
-    const qtdUnit1 = await QtdUnitFactory.merge({ name: 'KG' }).create()
-
-    const recipePayload1 = {
-      name: 'Brownie',
-      prepareTime: 2,
-      userId: user.id,
-      prepareTimeUnitId: prepareTimeUnit1.id,
-      categoryId: category1.id,
-      ingredients: [
-        { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit1.id },
-        { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
-      ],
-      prepareModes: [
-        {
-          description: 'Faça isso - 1',
-        },
-        {
-          description: 'Faça isso - 2',
-        },
-      ],
-    }
-    await client.post('/recipes').json(recipePayload1)
-    await client.post('/recipes').json({
-      ...recipePayload1,
-      ingredients: [
-        { name: 'Leiteee', qtd: 1, qtd_units_id: qtdUnit1.id },
-        { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
-      ],
-    })
-    await client.post('/recipes').json({
-      ...recipePayload1,
-      ingredients: [
-        { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit1.id },
-        { name: 'Manteigaaa', qtd: 1, qtd_units_id: qtdUnit1.id },
-      ],
-    })
-
-    const response = await client.post('/search-recipe').json({
-      ingredients: ['Leite', 'Manteigaaa'],
-    })
-
-    console.log(JSON.stringify(response.body(), null, 4))
-  })
-
-  test('it should return a list of recipes by user', async ({ client }) => {
+  test('it should calculate similarity of recipes', async ({ client }) => {
     const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
     const category1 = await CategoryFactory.create()
     const qtdUnit1 = await QtdUnitFactory.merge({ name: 'KG' }).create()
@@ -131,19 +47,87 @@ test.group('User', (group) => {
       ],
     }
     await client.post('/recipes').json(recipePayload1)
-    await client.post('/recipes').json({ ...recipePayload1, name: 'Macarrao 2' })
+    await client.post('/recipes').json({
+      ...recipePayload1,
+      name: 'Brownie 2',
+      ingredients: [
+        { name: 'Ovo', qtd: 1, qtd_units_id: qtdUnit1.id },
+        { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
+      ],
+    })
+    await client.post('/recipes').json({ ...recipePayload1, name: 'Frango' })
 
-    const userFactory = await UserFactory.create()
-    await client
-      .post('/recipes')
-      .json({ ...recipePayload1, name: 'Frango', userId: userFactory.id })
-    await client
-      .post('/recipes')
-      .json({ ...recipePayload1, name: 'Parmegiana 2', userId: userFactory.id })
-
-    const response = await client.get(`/search-recipe/brownie/${user.id}`)
+    const response = await client.get('/similarity')
     console.log(JSON.stringify(response.body(), null, 4))
   })
+
+  test('it should calculate similarity of users', async ({ client }) => {
+    const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
+    const category1 = await CategoryFactory.create()
+    const qtdUnit1 = await QtdUnitFactory.merge({ name: 'KG' }).create()
+
+    const userFactory = await UserFactory.merge({ password: 'test' }).create()
+    const userFactoryBody = await client
+      .post('/sessions')
+      .json({ email: userFactory.email, password: 'test' })
+
+    const recipePayload1 = {
+      name: 'Brownie',
+      prepareTime: 2,
+      userId: user.id,
+      isPrivate: true,
+      prepareTimeUnitId: prepareTimeUnit1.id,
+      categoryId: category1.id,
+      ingredients: [
+        { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit1.id },
+        { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
+      ],
+      prepareModes: [
+        {
+          description: 'Faça isso - 1',
+        },
+        {
+          description: 'Faça isso - 2',
+        },
+      ],
+    }
+    const recipe1 = await client.post('/recipes').json(recipePayload1)
+    const recipe2 = await client.post('/recipes').json({
+      ...recipePayload1,
+      name: 'Brownie 2',
+      ingredients: [
+        { name: 'Ovo', qtd: 1, qtd_units_id: qtdUnit1.id },
+        { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
+      ],
+    })
+    const recipe3 = await client.post('/recipes').json({ ...recipePayload1, name: 'Frango' })
+
+    // USUARIO LOGADO
+    await client
+      .post(`/recipes/${recipe1.body().recipe.id}/like`)
+      .headers({ Authorization: `Bearer ${token}` })
+
+    await client
+      .post(`/recipes/${recipe2.body().recipe.id}/like`)
+      .headers({ Authorization: `Bearer ${token}` })
+
+    // USUARIO CRIADO
+    await client
+      .post(`/recipes/${recipe1.body().recipe.id}/like`)
+      .headers({ Authorization: `Bearer ${userFactoryBody.body().token.token}` })
+    await client
+      .post(`/recipes/${recipe2.body().recipe.id}/like`)
+      .headers({ Authorization: `Bearer ${userFactoryBody.body().token.token}` })
+    await client
+      .post(`/recipes/${recipe3.body().recipe.id}/like`)
+      .headers({ Authorization: `Bearer ${userFactoryBody.body().token.token}` })
+
+    const response = await client.get('/similarity-users')
+    // const teste = await Database.from('users').select('*')
+    // console.log(teste)
+
+    // console.log(JSON.stringify(response.body(), null, 4))
+  }).pin()
 
   group.setup(async () => {
     const client = new ApiClient()
@@ -159,5 +143,8 @@ test.group('User', (group) => {
   group.teardown(async () => {
     const client = new ApiClient()
     await client.delete('/sessions').headers({ Authorization: `Bearer ${token}` })
+
+    await Database.beginGlobalTransaction()
+    return () => Database.rollbackGlobalTransaction()
   })
 })

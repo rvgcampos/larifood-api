@@ -4,11 +4,22 @@ import Favorite from 'App/Models/Favorite'
 export default class FavoritesController {
   public async favorite({ request, response, auth }: HttpContextContract) {
     const recipeId = request.param('recipeId')
+    const { favoriteFolderId } = request.only(['favoriteFolderId'])
     const user = await auth.authenticate()
 
-    const favorite = await Favorite.create({ recipeId, userId: user.id })
+    console.log(favoriteFolderId)
 
-    return response.created(favorite)
+    if (favoriteFolderId === null) {
+      const favorite = await Favorite.create({ recipeId, userId: user.id })
+      return response.created(favorite)
+    } else {
+      const favorite = await Favorite.create({
+        recipeId,
+        userId: user.id,
+        favoriteFolderId: favoriteFolderId,
+      })
+      return response.created(favorite)
+    }
   }
 
   public async unFavorite({ request, response, auth }: HttpContextContract) {

@@ -1,6 +1,7 @@
 import Factory from '@ioc:Adonis/Lucid/Factory'
 import Category from 'App/Models/Category'
 import Comment from 'App/Models/Comment'
+import FavoritesFolder from 'App/Models/FavoritesFolder'
 import Ingredient from 'App/Models/Ingredient'
 import PrepareMode from 'App/Models/PrepareMode'
 import PrepareTimeUnit from 'App/Models/PrepareTimeUnit'
@@ -59,5 +60,11 @@ export const PrepareModeFactory = Factory.define(PrepareMode, ({ faker }) => {
 export const CommentFactory = Factory.define(Comment, ({ faker }) => {
   return {
     content: faker.lorem.slug(),
+  }
+}).build()
+
+export const FavoritesFolderFactory = Factory.define(FavoritesFolder, ({ faker }) => {
+  return {
+    name: faker.name.firstName(),
   }
 }).build()

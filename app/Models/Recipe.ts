@@ -11,6 +11,9 @@ export default class Recipe extends BaseModel {
   public userId: number
 
   @column()
+  public isPrivate: boolean
+
+  @column()
   public prepareTimeUnitId: number
 
   @column()

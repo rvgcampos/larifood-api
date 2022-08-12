@@ -1,19 +1,21 @@
+import Recipe from 'App/Models/Recipe'
 import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import Recipe from './Recipe'
 
-export default class Favorite extends BaseModel {
-  @column({ isPrimary: true })
+export default class UsersLike extends BaseModel {
+  public tableName = 'users_likes'
+
+  @column()
   public id: number
 
   @column()
   public userId: number
 
   @column()
-  public favoriteFolderId: number
+  public recipeId: number
 
   @column()
-  public recipeId: number
+  public isLiked: boolean
 
   @belongsTo(() => Recipe, {
     foreignKey: 'recipeId',

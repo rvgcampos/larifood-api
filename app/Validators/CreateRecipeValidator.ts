@@ -6,6 +6,7 @@ export default class CreateRecipeValidator {
 
   public schema = schema.create({
     name: schema.string(),
+    isPrivate: schema.boolean(),
     prepareTime: schema.number(),
     userId: schema.number([rules.exists({ table: 'users', column: 'id' })]),
     prepareTimeUnitId: schema.number([rules.exists({ table: 'prepare_time_units', column: 'id' })]),

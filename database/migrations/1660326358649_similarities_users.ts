@@ -1,13 +1,13 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'favorites'
+  protected tableName = 'similarities_users'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table
-        .integer('user_id')
+        .integer('user_from_id')
         .unsigned()
         .notNullable()
         .references('id')
@@ -15,23 +15,14 @@ export default class extends BaseSchema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE')
       table
-        .integer('recipe_id')
+        .integer('user_to_id')
         .unsigned()
         .notNullable()
         .references('id')
-        .inTable('recipes')
+        .inTable('users')
         .onUpdate('CASCADE')
         .onDelete('CASCADE')
-      table
-        .integer('favorite_folder_id')
-        .unsigned()
-        .nullable()
-        .references('id')
-        .inTable('favorites_folders')
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE')
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
+      table.float('similarity')
     })
   }
 

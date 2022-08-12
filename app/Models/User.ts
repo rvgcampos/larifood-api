@@ -1,3 +1,4 @@
+import UsersLike from 'App/Models/UsersLike'
 import { DateTime } from 'luxon'
 import {
   BaseModel,
@@ -8,14 +9,19 @@ import {
   manyToMany,
   ManyToMany,
   computed,
+  hasOne,
+  HasOne,
 } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
 import LinkToken from './LinkToken'
 import Recipe from './Recipe'
 import UsersComment from './UsersComment'
 import Favorite from './Favorite'
+import File from './File'
 
 export default class User extends BaseModel {
+  public tableName = 'users'
+
   @column({ isPrimary: true })
   public id: number
 
@@ -64,6 +70,12 @@ export default class User extends BaseModel {
   })
   public favorites: HasMany<typeof Favorite>
 
+  @hasOne(() => File, {
+    foreignKey: 'ownerId',
+    onQuery: (query) => query.where({ fileCategory: 'avatar' }),
+  })
+  public avatar: HasOne<typeof File>
+
   @manyToMany(() => UsersComment, {
     pivotTable: 'users_comments',
     localKey: 'id',
@@ -71,7 +83,16 @@ export default class User extends BaseModel {
     relatedKey: 'id',
     pivotRelatedForeignKey: 'user_id',
   })
-  public skills: ManyToMany<typeof UsersComment>
+  public comments: ManyToMany<typeof UsersComment>
+
+  @manyToMany(() => Recipe, {
+    pivotTable: 'users_likes',
+    localKey: 'id',
+    pivotForeignKey: 'user_id',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'recipe_id',
+  })
+  public likes: ManyToMany<typeof Recipe>
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

@@ -28,6 +28,7 @@ export default class RecipesController {
     const recipe = await Recipe.create({
       name: data.name,
       prepareTime: data.prepareTime,
+      isPrivate: data.isPrivate,
       userId: data.userId,
       prepareTimeUnitId: data.prepareTimeUnitId,
       categoryId: data.categoryId,
