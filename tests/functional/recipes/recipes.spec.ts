@@ -169,6 +169,7 @@ test.group('Recipes', (group) => {
     assert.isEmpty(emptyRecipe)
   })
 
+  // RecipesController.show
   test('it should show a recipe', async ({ client }) => {
     const prepareTimeUnit = await PrepareTimeUnitFactory.create()
     const category = await CategoryFactory.create()
@@ -178,6 +179,7 @@ test.group('Recipes', (group) => {
       name: 'Brownie',
       prepareTime: 2,
       userId: 1,
+      isPrivate: false,
       prepareTimeUnitId: prepareTimeUnit.id,
       categoryId: category.id,
       ingredients: [
@@ -201,6 +203,7 @@ test.group('Recipes', (group) => {
       userId: 1,
       prepareTimeUnitId: prepareTimeUnit.id,
       categoryId: category.id,
+      isPrivate: false,
       ingredients: [
         { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit.id },
         { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit.id },
@@ -216,9 +219,9 @@ test.group('Recipes', (group) => {
     }
     const recipe2 = await client.post('/recipes').json(recipePayload2)
 
+    // console.log(util.inspect(recipe2.body(), { showHidden: false, depth: null, colors: true }))
     const response = await client.get(`/recipes/${recipe2.body().recipe.id}`)
-    console.log(util.inspect(response.body(), { showHidden: false, depth: null, colors: true }))
-    // console.log(JSON.stringify(response.body(), null, 4))
+    console.log(JSON.stringify(response.body(), null, 4))
   })
 
   group.setup(async () => {

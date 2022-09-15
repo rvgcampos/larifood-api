@@ -18,17 +18,17 @@ test.group('User', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
+  // UsersController.store
   test('it should create an user', async ({ assert, client }) => {
     const userPayload = {
       email: 'test@test.com',
       username: 'test',
       password: 'testee',
-      imageUrl: 'https//images.com/image/1',
     }
 
     const response = await client.post('/users').json(userPayload)
 
-    const { password, imageUrl, ...expected } = userPayload
+    const { password, ...expected } = userPayload
 
     response.assertStatus(201)
     response.assertBodyContains({ user: expected })
@@ -41,7 +41,7 @@ test.group('User', (group) => {
     const { email } = await UserFactory.create()
     const response = await client
       .post('/users')
-      .json({ email, username: 'test', password: 'testee', imageUrl: 'https//images.com/image/1' })
+      .json({ email, username: 'test', password: 'testee' })
     response.assertStatus(409)
 
     assert.include(response.body().message, 'email')
@@ -55,7 +55,6 @@ test.group('User', (group) => {
       username,
       email: 'test@test.com',
       password: 'testee',
-      imageUrl: 'https//images.com/image/1',
     })
     response.assertStatus(409)
 
@@ -89,21 +88,27 @@ test.group('User', (group) => {
     assert.equal(response.body().status, 422)
   })
 
+  // UsersController.update
   test('it should update an user', async ({ assert, client }) => {
     const email = 'test@test.com'
-    const imageUrl = 'http://github.com/rvgcmapos'
 
     const response = await client
       .put(`/users/${user.id}`)
       .headers({ Authorization: `Bearer ${token}` })
-      .json({ email, imageUrl, password: user.password })
+      .json({
+        name: 'RENATO',
+        description: 'sdas',
+        username: user.username,
+        email,
+        password: user.password,
+      })
 
     response.assertStatus(200)
-    console.log(response.body())
+
+    console.log(JSON.stringify(response.body(), null, 4))
 
     assert.exists(response.body().user, 'User undefined')
     assert.equal(response.body().user.email, email)
-    assert.equal(response.body().user.image_url, imageUrl)
     assert.equal(response.body().user.id, user.id)
   })
 
@@ -114,7 +119,7 @@ test.group('User', (group) => {
       .put(`/users/${user.id}`)
       .headers({ Authorization: `Bearer ${token}` })
 
-      .json({ email: user.email, imageUrl: user.imageUrl, password })
+      .json({ email: user.email, password })
 
     response.assertStatus(200)
     console.log(response.body())
@@ -139,26 +144,26 @@ test.group('User', (group) => {
   })
 
   test('it should return 422 when providing an invalid email', async ({ assert, client }) => {
-    const { id, password, imageUrl } = await UserFactory.create()
+    const { id, password } = await UserFactory.create()
 
     const response = await client
       .put(`/users/${id}`)
       .headers({ Authorization: `Bearer ${token}` })
 
-      .json({ password, imageUrl, email: 'test@' })
+      .json({ password, email: 'test@' })
 
     assert.equal(response.body().code, 'BAD_REQUEST')
     assert.equal(response.body().status, 422)
   })
 
   test('it should return 422 when providing an invalid password', async ({ assert, client }) => {
-    const { id, email, imageUrl } = await UserFactory.create()
+    const { id, email } = await UserFactory.create()
 
     const response = await client
       .put(`/users/${id}`)
       .headers({ Authorization: `Bearer ${token}` })
 
-      .json({ password: 'tes', imageUrl, email })
+      .json({ password: 'tes', email })
 
     assert.equal(response.body().code, 'BAD_REQUEST')
     assert.equal(response.body().status, 422)
@@ -170,14 +175,14 @@ test.group('User', (group) => {
     const response = await client
       .put(`/users/${id}`)
       .headers({ Authorization: `Bearer ${token}` })
-      .json({ password, imageUrl: 'test', email })
+      .json({ password, email })
 
     assert.equal(response.body().code, 'BAD_REQUEST')
     assert.equal(response.body().status, 422)
   })
 
   // ROTA: ME
-  test('it should return informations about user', async ({ assert, client }) => {
+  test('it should return informations about an user', async ({ assert, client }) => {
     const prepareTimeUnit = await PrepareTimeUnitFactory.create()
     const category = await CategoryFactory.create()
     const qtdUnit = await QtdUnitFactory.create()
@@ -186,6 +191,7 @@ test.group('User', (group) => {
       name: 'Brownie',
       prepareTime: 2,
       userId: user.id,
+      isPrivate: true,
       prepareTimeUnitId: prepareTimeUnit.id,
       categoryId: category.id,
       ingredients: [
@@ -207,9 +213,10 @@ test.group('User', (group) => {
     const response = await client.get('/users').headers({
       Authorization: `Bearer ${token}`,
     })
+
     console.log(JSON.stringify(response.body(), null, 4))
 
-    assert.isNotEmpty(response.body().user)
+    // assert.isNotEmpty(response.body().user)
   })
 
   test('it should not return data when tokens is not passed', async ({ assert, client }) => {
@@ -231,18 +238,14 @@ test.group('User', (group) => {
   })
 
   // ROTA: INDEX
-  test('it should return data about an certain user', async ({ assert, client }) => {
+  test('it should return data about an certain user', async ({ client }) => {
     const newUser = await UserFactory.create()
 
     const response = await client.get(`/users/${newUser.id}`).headers({
       Authorization: `Bearer ${token}`,
     })
-    console.log(response.body())
 
-    response.assertStatus(200)
-    const body = response.body()
-    assert.isDefined(body.user, 'User is not defined')
-    assert.notEqual(user.id, body.user.id)
+    console.log(JSON.stringify(response.body(), null, 4))
   })
 
   test('it should not return data about an certain user with invalid id', async ({
@@ -263,7 +266,7 @@ test.group('User', (group) => {
     const newUser = await UserFactory.merge({ password: plainPassword }).create()
     const response = await client
       .post('/sessions')
-      .json({ email: newUser.email, password: plainPassword })
+      .json({ name: 'RENATO1', email: newUser.email, password: plainPassword })
     token = response.body().token.token
     user = newUser
   })

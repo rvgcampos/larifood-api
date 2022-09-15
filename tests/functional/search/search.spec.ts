@@ -17,6 +17,7 @@ test.group('User', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
+  // SEARCH RECIPE
   test('it should return a list of recipes', async ({ client }) => {
     const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
     const category1 = await CategoryFactory.create()
@@ -26,6 +27,7 @@ test.group('User', (group) => {
       name: 'Brownie',
       prepareTime: 2,
       userId: user.id,
+      isPrivate: false,
       prepareTimeUnitId: prepareTimeUnit1.id,
       categoryId: category1.id,
       ingredients: [
@@ -51,8 +53,8 @@ test.group('User', (group) => {
 
   test('it should return a list of users', async ({ client }) => {
     const user1 = await UserFactory.create()
-    const user2 = await UserFactory.create()
-    const user3 = await UserFactory.create()
+    await UserFactory.create()
+    await UserFactory.create()
 
     const response = await client.get(`/search-user/${user1.username}`)
     console.log(JSON.stringify(response.body(), null, 4))
@@ -67,6 +69,7 @@ test.group('User', (group) => {
       name: 'Brownie',
       prepareTime: 2,
       userId: user.id,
+      isPrivate: false,
       prepareTimeUnitId: prepareTimeUnit1.id,
       categoryId: category1.id,
       ingredients: [
@@ -99,7 +102,7 @@ test.group('User', (group) => {
     })
 
     const response = await client.post('/search-recipe').json({
-      ingredients: ['Leite', 'Manteigaaa'],
+      ingredients: ['Leite', 'Manteiga'],
     })
 
     console.log(JSON.stringify(response.body(), null, 4))

@@ -1,58 +1,47 @@
-import Database from '@ioc:Adonis/Lucid/Database'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Recipe from 'App/Models/Recipe'
 import Similarity from 'App/Models/Similarity'
-import SimilaritiesUser from 'App/Models/SimilaritiesUser'
-import User from 'App/Models/User'
 
-export default class SimilarityUsersController {
+export default class SimilarityRecipesController {
   public async calculate({ response }: HttpContextContract) {
-    let users = await User.query().preload('likes')
-    users = users.filter((value) => {
-      return value.likes.length !== 0
-    })
+    const recipes = await Recipe.query().preload('ingredients')
 
-    const usersLikes: Object[] = []
-    for await (const user of users) {
-      const userId = user.id
-      const likesIds: any[] = []
-      for (const like of user.likes) {
-        likesIds.push(like.id)
+    const recipesIngredients: Object[] = []
+    for (const recipe of recipes) {
+      const ingredientsName: any[] = []
+      for (const obj of recipe.ingredients) {
+        ingredientsName.push(obj.name)
       }
+      const recipeId = recipe.id
       const obj = {}
-      obj[userId] = likesIds
-      usersLikes.push(obj)
+      obj[recipeId] = ingredientsName
+      recipesIngredients.push(obj)
     }
 
-    // console.log(usersLikes)
-
-    for (const user of usersLikes) {
-      for (const userCompare of usersLikes) {
+    for (const recipe of recipesIngredients) {
+      for (const recipeCompare of recipesIngredients) {
         const similaridade = this.similaridade(
-          Object.values(user)[0],
-          Object.values(userCompare)[0]
+          Object.values(recipe)[0],
+          Object.values(recipeCompare)[0]
         )
-        await SimilaritiesUser.create({
-          userFromId: Number(Object.keys(user)[0]),
-          userToId: Number(Object.keys(userCompare)[0]),
+        await Similarity.create({
+          recipeFromId: Number(Object.keys(recipe)[0]),
+          recipeToId: Number(Object.keys(recipeCompare)[0]),
           similarity: similaridade,
         })
       }
     }
 
-    const test = await Database.query().from('similarities_users')
-    // console.log(test)
+    let similaridades = await Similarity.query()
+      .where('recipe_from_id', 1)
+      .andWhereNot('recipe_to_id', 1)
+      .orderBy('similarity', 'desc')
+      .limit(20)
+      .preload('recipeTo')
 
-    // let similaridades = await SimilarityUser.query()
-    //   .where('recipe_from_id', 1)
-    //   .andWhereNot('recipe_to_id', 1)
-    //   .orderBy('similarity', 'desc')
-    //   .limit(20)
-    //   .preload('recipeTo')
+    similaridades = similaridades.sort(() => Math.random() - 0.5)
 
-    // similaridades = similaridades.sort(() => Math.random() - 0.5)
-
-    response.created(users)
+    response.created(similaridades)
   }
 
   public calculaSimilaridade(vetor1: number[], vetor2: number[]) {

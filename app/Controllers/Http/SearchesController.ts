@@ -14,7 +14,10 @@ export default class SearchesController {
   public async searchRecipes({ request, response }: HttpContextContract) {
     const searchRecipe = request.param('searchString') as String
 
-    const recipes = await Recipe.query().whereLike('name', `%${searchRecipe.toLowerCase().trim()}%`)
+    const recipes = await Recipe.query()
+      .whereLike('name', `%${searchRecipe.toLowerCase().trim()}%`)
+      .preload('avatar')
+      .preload('user')
 
     return response.created(recipes)
   }
@@ -26,20 +29,21 @@ export default class SearchesController {
     let recipes = await Recipe.query().preload('ingredients', (query) => {
       query.whereIn('name', ingredients)
     })
+    console.log(recipes.length)
 
     recipes = recipes.filter((value) => {
       return value.ingredients.length === Number(ingredients.length)
     })
+    console.log(recipes.length)
 
-    const newRecipes: Recipe[] = []
+    // const newRecipes: Recipe[] = []
 
-    for await (const recipe of recipes) {
-      const newRecipe = await recipe.refresh()
-      await newRecipe.load('ingredients')
-      newRecipes.push(newRecipe)
-    }
+    // for await (const recipe of recipes) {
+    //   const newRecipe = await recipe.refresh()
+    //   await newRecipe.load('ingredients')
+    // }
 
-    return response.created({ newRecipes })
+    return response.created({ recipes })
   }
 
   public async searchRecipesByUser({ request, response }: HttpContextContract) {

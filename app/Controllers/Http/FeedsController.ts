@@ -5,14 +5,27 @@ import User from 'App/Models/User'
 import UsersLike from 'App/Models/UsersLike'
 
 export default class FeedsController {
-  public async index({ response, auth }: HttpContextContract) {
+  public async chronologicalFeed({ response, auth }: HttpContextContract) {
     const user = await auth.authenticate()
 
-    const recipes = await User.query()
-      .where('id', user.id)
-      .preload('following', (followingQuery) => {
-        followingQuery.preload('recipes')
+    const following = await User.query().where('id', user.id).preload('following').firstOrFail()
+
+    let followingList: any[] = []
+    following.following.forEach((el) => {
+      followingList.push(el.id)
+    })
+
+    const recipes = await Recipe.query()
+      .whereIn('userId', followingList)
+      .preload('user')
+      .preload('avatar')
+      .preload('usersLikes', (query) => {
+        query.where('userId', user.id)
       })
+      .preload('usersFavorites', (query) => {
+        query.where('userId', user.id)
+      })
+      .orderBy('createdAt', 'desc')
 
     return response.ok({ recipes })
   }
@@ -25,6 +38,7 @@ export default class FeedsController {
       .andWhereNot('isLiked', true)
       .preload('recipe')
       .limit(50)
+    // console.log(likedRecipes.length)
 
     likedRecipes = likedRecipes.sort(() => Math.random() - 0.5)
 
@@ -45,6 +59,6 @@ export default class FeedsController {
 
     similaridades = similaridades.sort(() => Math.random() - 0.5)
 
-    return response.created({})
+    return response.created({ similaridades })
   }
 }

@@ -57,7 +57,7 @@ test.group('User', (group) => {
     })
     await client.post('/recipes').json({ ...recipePayload1, name: 'Frango' })
 
-    const response = await client.get('/similarity')
+    const response = await client.get('/similarity-recipes')
     console.log(JSON.stringify(response.body(), null, 4))
   })
 
@@ -126,8 +126,8 @@ test.group('User', (group) => {
     // const teste = await Database.from('users').select('*')
     // console.log(teste)
 
-    // console.log(JSON.stringify(response.body(), null, 4))
-  }).pin()
+    console.log(JSON.stringify(response.body(), null, 4))
+  })
 
   group.setup(async () => {
     const client = new ApiClient()

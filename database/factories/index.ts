@@ -11,10 +11,11 @@ import User from 'App/Models/User'
 
 export const UserFactory = Factory.define(User, ({ faker }) => {
   return {
+    name: faker.name.findName(),
     username: faker.name.firstName(),
     email: faker.internet.email(),
+    description: faker.lorem.sentence(),
     password: faker.internet.password(),
-    imageUrl: faker.internet.url(),
   }
 }).build()
 

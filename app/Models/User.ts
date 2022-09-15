@@ -21,6 +21,7 @@ import File from './File'
 
 export default class User extends BaseModel {
   public tableName = 'users'
+  public serializeExtras = true
 
   @column({ isPrimary: true })
   public id: number
@@ -31,11 +32,14 @@ export default class User extends BaseModel {
   @column()
   public email: string
 
-  @column({ serializeAs: null })
-  public password: string
+  @column()
+  public name: string
 
   @column()
-  public imageUrl: string
+  public description: string
+
+  @column({ serializeAs: null })
+  public password: string
 
   @hasMany(() => LinkToken, {
     foreignKey: 'userId',
@@ -105,20 +109,5 @@ export default class User extends BaseModel {
     if (user.$dirty.password) {
       user.password = await Hash.make(user.password)
     }
-  }
-
-  @computed()
-  public get followersCount() {
-    return this.$extras.followers_count
-  }
-
-  @computed()
-  public get followingCount() {
-    return this.$extras.following_count
-  }
-
-  @computed()
-  public get isFollowing() {
-    return this.$extras.isFollowing
   }
 }

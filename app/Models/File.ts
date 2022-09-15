@@ -16,6 +16,8 @@ export default class File extends BaseModel {
 
   @computed()
   public get url(): string {
-    return `${Env.get('APP_URL')}/uploads/${this.fileName}`
+    return this.fileCategory === 'avatar'
+      ? `${Env.get('APP_URL')}/uploads/${this.fileName}`
+      : `${Env.get('APP_URL')}/recipes/${this.fileName}`
   }
 }

@@ -1,3 +1,4 @@
+import Database from '@ioc:Adonis/Lucid/Database'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import BadRequest from 'App/Exceptions/BadRequestException'
 import User from 'App/Models/User'
@@ -5,11 +6,32 @@ import CreateUser from 'App/Validators/CreateUserValidator'
 import UpdateUser from 'App/Validators/UpdateUserValidator'
 
 export default class UsersController {
-  public async show({ request, response }: HttpContextContract) {
+  public async show({ request, response, auth }: HttpContextContract) {
     const id = request.param('id')
-    const user = await User.findOrFail(id)
-    await user.load('recipes')
-    return response.ok({ user })
+    const loggedUser = await auth.authenticate()
+
+    let user = await User.findOrFail(id)
+    user = await User.query()
+      .where('id', user.id)
+      .preload('recipes', (query) => {
+        query.preload('avatar')
+      })
+      .withAggregate('following', (query) => {
+        query.count('*').as('following_count')
+      })
+      .withAggregate('followers', (query) => {
+        query.count('*').as('follower_count')
+      })
+      .withAggregate('recipes', (query) => {
+        query.count('*').as('recipes_count')
+      })
+      .firstOrFail()
+
+    const isFollowing = await Database.from('follows')
+      .where('follower_id', loggedUser.id)
+      .andWhere('following_id', user.id)
+
+    return response.ok({ user, isFollowing: isFollowing.length === 1 ? true : false })
   }
 
   public async store({ request, response }: HttpContextContract) {
@@ -25,16 +47,18 @@ export default class UsersController {
   }
 
   public async update({ request, response, bouncer }: HttpContextContract) {
-    const { email, password, imageUrl } = await request.validate(UpdateUser)
+    const { name, username, description, email, password } = await request.validate(UpdateUser)
 
     const id = request.param('id')
     const user = await User.findOrFail(id)
 
     await bouncer.authorize('updateUser', user)
 
+    user.name = name
+    user.username = username
+    user.description = description
     user.email = email
     user.password = password
-    if (imageUrl) user.imageUrl = imageUrl
 
     await user.save()
 
@@ -42,8 +66,24 @@ export default class UsersController {
   }
 
   public async me({ response, auth }: HttpContextContract) {
-    const user = await auth.authenticate()
-    await user.load('recipes')
+    let user = await auth.authenticate()
+
+    user = await User.query()
+      .where('id', user.id)
+      .preload('recipes', (query) => {
+        query.preload('avatar')
+      })
+      .withAggregate('following', (query) => {
+        query.count('*').as('following_count')
+      })
+      .withAggregate('followers', (query) => {
+        query.count('*').as('follower_count')
+      })
+      .withAggregate('recipes', (query) => {
+        query.count('*').as('recipes_count')
+      })
+      .firstOrFail()
+
     return response.ok({ user })
   }
 }
