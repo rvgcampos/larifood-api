@@ -6,7 +6,9 @@ export default class SearchesController {
   public async searchUsers({ request, response }: HttpContextContract) {
     const searchUser = request.param('searchString') as String
 
-    const users = await User.query().whereLike('username', `%${searchUser.toLowerCase().trim()}%`)
+    const users = await User.query()
+      .whereLike('username', `%${searchUser.toLowerCase().trim()}%`)
+      .preload('avatar')
 
     return response.created(users)
   }
@@ -15,7 +17,7 @@ export default class SearchesController {
     const searchRecipe = request.param('searchString') as String
 
     const recipes = await Recipe.query()
-      .whereLike('name', `%${searchRecipe.toLowerCase().trim()}%`)
+      .whereILike('name', `%${searchRecipe.toLowerCase().trim()}%`)
       .preload('avatar')
       .preload('user')
 

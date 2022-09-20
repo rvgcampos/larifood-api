@@ -70,6 +70,7 @@ export default class UsersController {
 
     user = await User.query()
       .where('id', user.id)
+      .preload('avatar')
       .preload('recipes', (query) => {
         query.preload('avatar')
       })

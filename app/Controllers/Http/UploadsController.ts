@@ -7,6 +7,6 @@ export default class UploadsController {
   }
 
   public async showRecipe({ params, response }: HttpContextContract) {
-    return response.download(Application.tmpPath('recipes', params.file))
+    return response.download(Application.tmpPath('recipes-file', params.file))
   }
 }

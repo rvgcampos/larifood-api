@@ -33,6 +33,10 @@ export default class AvatarController {
 
   public async addPostPhoto({ request, auth }: HttpContextContract) {
     const { file, idRecipe } = await request.validate(AddPhotoRecipeValidator)
+    console.log(file)
+    console.log(typeof file)
+    console.log(idRecipe)
+    console.log(typeof idRecipe)
 
     const trx = await Database.transaction()
 
@@ -46,7 +50,7 @@ export default class AvatarController {
 
     const avatar = await recipe.related('avatar').firstOrCreate(searchPayload, savePayload)
 
-    await file.move(Application.tmpPath('recipes'), {
+    await file.move(Application.tmpPath('recipes-file'), {
       name: avatar.fileName,
       overwrite: true,
     })

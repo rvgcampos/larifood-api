@@ -19,6 +19,14 @@ export default class CommentsController {
     return response.created({ comment: updatedComment })
   }
 
+  public async destroy({ response, params }: HttpContextContract) {
+    const comment = await Comment.findOrFail(params.commentId)
+
+    await comment.delete()
+
+    return response.ok({})
+  }
+
   public async like({ request, response, auth }: HttpContextContract) {
     const commentId = request.param('commentId')
     const user = await auth.authenticate()

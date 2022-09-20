@@ -2,7 +2,7 @@ import Route from '@ioc:Adonis/Core/Route'
 
 // USERS
 Route.get('/users/:id', 'UsersController.show').middleware('auth') // Ver perfil de outro usuário
-Route.get('/users', 'UsersController.me').middleware('auth') // Ver o proprio perfil
+Route.get('/users', 'UsersController.me') // Ver o proprio perfil
 Route.post('/users', 'UsersController.store') // Fazer o cadastro
 Route.post('/forgot-password', 'PasswordsController.forgotPassword') // Esqueceu a senha
 Route.post('/reset-password', 'PasswordsController.resetPassword') // Resetar a senha
@@ -15,7 +15,7 @@ Route.put('/avatar/users', 'AvatarController.update').middleware('auth') // Atua
 Route.delete('/avatar/users', 'AvatarController.destroy').middleware('auth') // Deletar foto do perfil
 Route.get('/uploads/:file', 'UploadsController.show') // Ver foto do perfil
 Route.get('/recipes-file/:file', 'UploadsController.showRecipe') // Ver foto do perfil
-Route.post('/photo/recipe', 'AvatarController.addPostPhoto').middleware('auth')
+Route.post('/photo/recipe', 'AvatarController.addPostPhoto')
 
 // LIKE
 Route.post('/recipes/:recipeId/like', 'LikesController.like') // Dar like em receita
@@ -53,6 +53,7 @@ Route.get('/favorites', 'FavoritesController.index') // Obter os favoritos
 // COMMENT
 Route.post('/recipes/:id/comment', 'CommentsController.store') // Comentar
 Route.put('/recipes/:id/comment/:commentId', 'CommentsController.update') // Editar comentário
+Route.delete('/recipes/:id/comment/:commentId', 'CommentsController.destroy') // Editar comentário
 Route.post('/recipes/:id/comment/:commentId/like', 'CommentsController.like') // Curtir Comentário
 
 // UTILS
