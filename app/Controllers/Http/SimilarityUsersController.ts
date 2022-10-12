@@ -7,10 +7,35 @@ import User from 'App/Models/User'
 
 export default class SimilarityUsersController {
   public async calculate({ response }: HttpContextContract) {
+    // const use = await SimilaritiesUser.query()
+    // console.log(use.length)
+
+    const u = await User.query()
+
+    for (const user of u) {
+      for (const userComp of u) {
+        await SimilaritiesUser.query()
+          .delete()
+          .where('userFromId', user.id)
+          .andWhere('userToId', userComp.id)
+      }
+    }
+
+    for (const user of u) {
+      for (const userComp of u) {
+        await SimilaritiesUser.create({
+          userFromId: user.id,
+          userToId: userComp.id,
+          similarity: 0,
+        })
+      }
+    }
+    SimilaritiesUser.create
+
     let users = await User.query().preload('likes')
-    users = users.filter((value) => {
-      return value.likes.length !== 0
-    })
+    // users = users.filter((value) => {
+    //   return value.likes.length !== 0
+    // })
 
     const usersLikes: Object[] = []
     for await (const user of users) {
@@ -18,6 +43,9 @@ export default class SimilarityUsersController {
       const likesIds: any[] = []
       for (const like of user.likes) {
         likesIds.push(like.id)
+      }
+      if (user.likes.length === 0) {
+        likesIds.push(-1)
       }
       const obj = {}
       obj[userId] = likesIds
@@ -28,15 +56,38 @@ export default class SimilarityUsersController {
 
     for (const user of usersLikes) {
       for (const userCompare of usersLikes) {
+        console.log(Object.values(user))
+        console.log(Object.values(userCompare))
+
         const similaridade = this.similaridade(
           Object.values(user)[0],
           Object.values(userCompare)[0]
         )
-        await SimilaritiesUser.create({
-          userFromId: Number(Object.keys(user)[0]),
-          userToId: Number(Object.keys(userCompare)[0]),
-          similarity: similaridade,
-        })
+        console.log(Number(Object.keys(user)[0]))
+        console.log(Number(Object.keys(userCompare)[0]))
+
+        console.log(similaridade)
+
+        const similaridadeModel = await SimilaritiesUser.query()
+          .where('userFromId', Number(Object.keys(user)[0]))
+          .andWhere('userToId', Number(Object.keys(userCompare)[0]))
+          .firstOrFail()
+
+        await similaridadeModel.merge({ similarity: similaridade })
+        await similaridadeModel.save()
+
+        // await SimilaritiesUser.updateOrCreate(
+        //   {
+        //     userFromId: Number(Object.keys(user)[0]),
+        //     userToId: Number(Object.keys(userCompare)[0]),
+        //     similarity: similaridade,
+        //   },
+        //   {
+        //     userFromId: Number(Object.keys(user)[0]),
+        //     userToId: Number(Object.keys(userCompare)[0]),
+        //     similarity: similaridade,
+        //   }
+        // )
       }
     }
 
@@ -52,7 +103,7 @@ export default class SimilarityUsersController {
 
     // similaridades = similaridades.sort(() => Math.random() - 0.5)
 
-    response.created(users)
+    response.created(test)
   }
 
   public calculaSimilaridade(vetor1: number[], vetor2: number[]) {
@@ -93,8 +144,8 @@ export default class SimilarityUsersController {
       vetor2[todasPalavras.indexOf(palavra)] += 1
     }
 
-    // console.log(vetor1)
-    // console.log(vetor2)
+    console.log(vetor1)
+    console.log(vetor2)
 
     return this.calculaSimilaridade(vetor1, vetor2)
   }

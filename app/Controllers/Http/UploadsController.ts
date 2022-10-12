@@ -3,7 +3,7 @@ import Application from '@ioc:Adonis/Core/Application'
 
 export default class UploadsController {
   public async show({ params, response }: HttpContextContract) {
-    return response.download(Application.tmpPath('uploads', params.file))
+    return response.download(Application.tmpPath('uploads-file', params.file))
   }
 
   public async showRecipe({ params, response }: HttpContextContract) {

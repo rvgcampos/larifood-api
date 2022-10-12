@@ -4,15 +4,19 @@ import Similarity from 'App/Models/Similarity'
 
 export default class SimilarityController {
   public async calculate({ request, response }: HttpContextContract) {
-    const id = request.only(['id'])
+    const recipeId = request.param('recipeId')
+    console.log(recipeId)
 
     let similaridades = await Similarity.query()
-      .where('recipe_from_id', Number(id))
+      .where('recipe_from_id', recipeId)
+      .andWhereNot('recipe_to_id', recipeId)
       .orderBy('similarity', 'desc')
-      .limit(20)
-      .preload('recipeTo')
+      .limit(6)
+      .preload('recipeTo', (query) => {
+        query.preload('avatar')
+      })
 
-    similaridades = similaridades.sort(() => Math.random() - 0.5)
+    // similaridades = similaridades.sort(() => Math.random() - 0.5)
 
     response.created(similaridades)
   }

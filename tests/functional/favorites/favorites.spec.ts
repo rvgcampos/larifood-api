@@ -157,6 +157,7 @@ test.group('User', (group) => {
       userId: user.id,
       prepareTimeUnitId: prepareTimeUnit1.id,
       categoryId: category1.id,
+      isPrivate: false,
       ingredients: [
         { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit1.id },
         { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },

@@ -14,7 +14,7 @@ export default class UsersController {
     user = await User.query()
       .where('id', user.id)
       .preload('recipes', (query) => {
-        query.preload('avatar')
+        query.preload('avatar').where('isPrivate', false)
       })
       .withAggregate('following', (query) => {
         query.count('*').as('following_count')
@@ -47,18 +47,17 @@ export default class UsersController {
   }
 
   public async update({ request, response, bouncer }: HttpContextContract) {
-    const { name, username, description, email, password } = await request.validate(UpdateUser)
+    const { name, username, description, email } = await request.validate(UpdateUser)
 
     const id = request.param('id')
     const user = await User.findOrFail(id)
 
-    await bouncer.authorize('updateUser', user)
+    // await bouncer.authorize('updateUser', user)
 
     user.name = name
     user.username = username
     user.description = description
     user.email = email
-    user.password = password
 
     await user.save()
 

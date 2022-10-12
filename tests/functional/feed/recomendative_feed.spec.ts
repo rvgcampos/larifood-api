@@ -45,9 +45,11 @@ test.group('Feed', (group) => {
       prepareModes: [
         {
           description: 'Faça isso - 1',
+          order: 1,
         },
         {
           description: 'Faça isso - 2',
+          order: 2,
         },
       ],
     }
@@ -62,6 +64,7 @@ test.group('Feed', (group) => {
         { name: 'Ovos', qtd: 1, qtd_units_id: qtdUnit1.id },
       ],
     })
+
     await client.post('/recipes').json({
       ...recipePayload1,
       ingredients: [
@@ -100,9 +103,11 @@ test.group('Feed', (group) => {
       prepareModes: [
         {
           description: 'Make this - 1',
+          order: 1,
         },
         {
           description: 'Make this - 2',
+          order: 2,
         },
       ],
     }
@@ -120,11 +125,12 @@ test.group('Feed', (group) => {
     await client
       .post(`/recipes/${user2Recipe2.body().recipe.id}/like`)
       .headers({ Authorization: `Bearer ${token}` })
-    const r = await Database.from('users_likes').where('user_id', user.id)
-    console.log(r)
+
+    // const r = await Database.from('users_likes').where('user_id', user.id)
+    // console.log(r)
 
     // CALCULANDO SIMILARIDADES
-    // await client.get('/similarity-users')
+    await client.get('/similarity-users')
     await client.get('/similarity-recipes')
 
     const response = await client.get('/recomendative-feed').headers({

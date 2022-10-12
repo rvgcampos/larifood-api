@@ -38,7 +38,7 @@ export default class User extends BaseModel {
   @column()
   public description: string
 
-  @column({ serializeAs: null })
+  @column()
   public password: string
 
   @hasMany(() => LinkToken, {

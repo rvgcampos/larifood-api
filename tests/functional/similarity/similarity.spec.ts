@@ -40,9 +40,11 @@ test.group('User', (group) => {
       prepareModes: [
         {
           description: 'Faça isso - 1',
+          order: 1,
         },
         {
           description: 'Faça isso - 2',
+          order: 2,
         },
       ],
     }
@@ -59,7 +61,7 @@ test.group('User', (group) => {
 
     const response = await client.get('/similarity-recipes')
     console.log(JSON.stringify(response.body(), null, 4))
-  })
+  }).pin()
 
   test('it should calculate similarity of users', async ({ client }) => {
     const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
@@ -85,9 +87,11 @@ test.group('User', (group) => {
       prepareModes: [
         {
           description: 'Faça isso - 1',
+          order: 1,
         },
         {
           description: 'Faça isso - 2',
+          order: 2,
         },
       ],
     }

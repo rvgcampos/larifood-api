@@ -1,7 +1,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 // USERS
-Route.get('/users/:id', 'UsersController.show').middleware('auth') // Ver perfil de outro usuário
+Route.get('/users/:id', 'UsersController.show') // Ver perfil de outro usuário
 Route.get('/users', 'UsersController.me') // Ver o proprio perfil
 Route.post('/users', 'UsersController.store') // Fazer o cadastro
 Route.post('/forgot-password', 'PasswordsController.forgotPassword') // Esqueceu a senha
@@ -13,7 +13,8 @@ Route.delete('/sessions', 'SessionsController.destroy') // Fazer logout
 // AVATAR
 Route.put('/avatar/users', 'AvatarController.update').middleware('auth') // Atualizar foto perfil
 Route.delete('/avatar/users', 'AvatarController.destroy').middleware('auth') // Deletar foto do perfil
-Route.get('/uploads/:file', 'UploadsController.show') // Ver foto do perfil
+Route.delete('/avatar/recipes', 'AvatarController.destroyRecipe').middleware('auth') // Deletar foto da receita
+Route.get('/uploads-file/:file', 'UploadsController.show') // Ver foto do perfil
 Route.get('/recipes-file/:file', 'UploadsController.showRecipe') // Ver foto do perfil
 Route.post('/photo/recipe', 'AvatarController.addPostPhoto')
 
@@ -43,7 +44,7 @@ Route.delete('/recipes/:id', 'RecipesController.destroy') // Excluir receita
 // SIMILARIDADE
 Route.get('/similarity-recipes', 'SimilarityRecipesController.calculate') // Similaridade entre receitas
 Route.get('/similarity-users', 'SimilarityUsersController.calculate') // Similaridade entre usuários
-Route.get('/similarity/:id', 'SimilarityController.calculate') // Similaridade entre receitas
+Route.get('/similarity/:recipeId', 'SimilarityController.calculate') // Similaridade entre receitas
 
 // FAVORITES
 Route.post('/favorite/:recipeId', 'FavoritesController.favorite') // Favoritar receita

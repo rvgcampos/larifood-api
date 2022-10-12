@@ -12,11 +12,14 @@ export default class RecipesController {
 
     const recipe = await Recipe.query()
       .where('id', Number(recipeId))
+      .preload('user')
       .preload('ingredients', (ingredientQuery) => {
         ingredientQuery.preload('qtdUnit')
       })
       .preload('prepareModes')
-      .preload('comments')
+      .preload('comments', (query) => {
+        query.preload('user')
+      })
       .preload('avatar')
       .firstOrFail()
 
@@ -53,12 +56,13 @@ export default class RecipesController {
   public async update({ request, response, auth, params }: HttpContextContract) {
     const id = request.param('id')
     const payload = await request.all()
-    const recipe = await Recipe.findOrFail(params.id)
+    let recipe = await Recipe.findOrFail(params.id)
 
     const recipePayload = {
       name: payload.name,
       prepareTime: payload.prepareTime,
       userId: payload.userId,
+      isPrivate: payload.isPrivate,
       prepareTimeUnitId: payload.prepareTimeUnitId,
       categoryId: payload.categoryId,
     }
@@ -66,8 +70,8 @@ export default class RecipesController {
 
     await recipe.merge(recipePayload).save()
 
-    await Database.query().from('ingredients').where('recipe_id', id)
-    await Database.query().from('prepare_modes').where('recipe_id', id)
+    await Database.query().from('ingredients').where('recipe_id', id).delete()
+    await Database.query().from('prepare_modes').where('recipe_id', id).delete()
     const ingredients: any = []
     const prepareModes: any = []
     for await (const ingredient of payload.ingredients) {
@@ -78,7 +82,9 @@ export default class RecipesController {
     }
     await trx.commit()
 
-    return response.ok({ recipe, ingredients, prepareModes })
+    await recipe.load('ingredients')
+
+    return response.ok({ recipe })
   }
 
   public async destroy({ response, auth, params }: HttpContextContract) {

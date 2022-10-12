@@ -21,6 +21,7 @@ export default class CreateRecipeValidator {
     prepareModes: schema.array([rules.minLength(1)]).members(
       schema.object().members({
         description: schema.string(),
+        order: schema.number(),
       })
     ),
   })

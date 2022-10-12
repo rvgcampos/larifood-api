@@ -8,27 +8,24 @@ import AddPhotoRecipeValidator from 'App/Validators/AddPhotoRecipeValidator'
 
 export default class AvatarController {
   public async update({ request, auth }: HttpContextContract) {
-    const response = await Database.transaction(async (trx) => {
-      const { file } = await request.validate(UpdateValidator)
+    const { file } = await request.validate(UpdateValidator)
 
-      const user = auth.user!.useTransaction(trx)
+    const user = auth.user!
 
-      const searchPayload = {}
-      const savePayload = {
-        fileCategory: 'avatar' as any,
-        fileName: `${user.username}-${new Date().getTime()}.${file.extname}`,
-      }
+    const searchPayload = {}
+    const savePayload = {
+      fileCategory: 'avatar' as any,
+      fileName: `${user.username}-${new Date().getTime()}.${file.extname}`,
+    }
 
-      const avatar = await user.related('avatar').firstOrCreate(searchPayload, savePayload)
+    const avatar = await user.related('avatar').firstOrCreate(searchPayload, savePayload)
 
-      await file.move(Application.tmpPath('uploads'), {
-        name: avatar.fileName,
-        overwrite: true,
-      })
-
-      return avatar
+    await file.move(Application.tmpPath('uploads-file'), {
+      name: avatar.fileName,
+      overwrite: true,
     })
-    return response
+
+    return avatar
   }
 
   public async addPostPhoto({ request, auth }: HttpContextContract) {
@@ -70,7 +67,7 @@ export default class AvatarController {
 
       await avatar.delete()
 
-      fs.unlinkSync(Application.tmpPath('uploads', avatar.fileName))
+      fs.unlinkSync(Application.tmpPath('uploads-file', avatar.fileName))
     })
   }
 }

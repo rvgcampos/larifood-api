@@ -6,6 +6,17 @@ export default class SimilarityRecipesController {
   public async calculate({ response }: HttpContextContract) {
     const recipes = await Recipe.query().preload('ingredients')
 
+    const r = await Recipe.query()
+
+    for (const recipe of r) {
+      for (const recipeComp of r) {
+        await Similarity.query()
+          .delete()
+          .where('recipeFromId', recipe.id)
+          .andWhere('recipeToId', recipeComp.id)
+      }
+    }
+
     const recipesIngredients: Object[] = []
     for (const recipe of recipes) {
       const ingredientsName: any[] = []

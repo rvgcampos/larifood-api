@@ -84,16 +84,11 @@ test.group('Recipes', (group) => {
     const category = await CategoryFactory.create()
     const qtdUnit = await QtdUnitFactory.create()
 
-    const recipe = await RecipeFactory.merge({
-      prepareTimeUnitId: prepareTimeUnit.id,
-      categoryId: category.id,
-      userId: user.id,
-    }).create()
-
     const recipePayload = {
       name: 'Brownie 2',
       prepareTime: 2,
       userId: 1,
+      isPrivate: false,
       prepareTimeUnitId: prepareTimeUnit.id,
       categoryId: category.id,
       ingredients: [
@@ -103,15 +98,26 @@ test.group('Recipes', (group) => {
       prepareModes: [
         {
           description: 'Faça isso - 1',
+          order: 1,
         },
         {
           description: 'Faça isso - 2',
+          order: 2,
         },
       ],
     }
+    const response = await client.post('/recipes').json(recipePayload)
+    console.log(JSON.stringify(response.body()), null, 5)
 
-    const response = await client.put(`/recipes/${recipe.id}`).json(recipePayload)
-    console.log(response.body())
+    const responseUpdate = await client.put(`/recipes/${response.body().recipe.id}`).json({
+      ...recipePayload,
+      ingredients: [
+        { name: 'LEITE', qtd: 1, qtd_units_id: qtdUnit.id },
+        { name: 'MANTEIGA', qtd: 1, qtd_units_id: qtdUnit.id },
+      ],
+    })
+
+    console.log(JSON.stringify(responseUpdate.body()), null, 5)
   })
 
   test('it should return 404 when providing an unexisting recipe for update', async ({

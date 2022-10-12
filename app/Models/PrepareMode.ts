@@ -12,6 +12,9 @@ export default class PrepareMode extends BaseModel {
   @column()
   public recipeId: number
 
+  @column()
+  public order: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
