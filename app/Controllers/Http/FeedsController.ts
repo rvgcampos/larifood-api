@@ -18,6 +18,7 @@ export default class FeedsController {
 
     const recipes = await Recipe.query()
       .whereIn('userId', followingList)
+      .andWhere('isPrivate', false)
       .preload('user', (query) => {
         query.preload('avatar')
       })

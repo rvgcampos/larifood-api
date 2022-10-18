@@ -34,7 +34,7 @@ test.group('User', (group) => {
       prepareTimeUnitId: prepareTimeUnit1.id,
       categoryId: category1.id,
       ingredients: [
-        { name: 'Leite', qtd: 1, qtd_units_id: qtdUnit1.id },
+        { name: 'Leite de Cabra', qtd: 1, qtd_units_id: qtdUnit1.id },
         { name: 'Manteiga', qtd: 1, qtd_units_id: qtdUnit1.id },
       ],
       prepareModes: [
@@ -60,7 +60,7 @@ test.group('User', (group) => {
     await client.post('/recipes').json({ ...recipePayload1, name: 'Frango' })
 
     const response = await client.get('/similarity-recipes')
-    console.log(JSON.stringify(response.body(), null, 4))
+    // console.log(JSON.stringify(response.body(), null, 4))
   }).pin()
 
   test('it should calculate similarity of users', async ({ client }) => {

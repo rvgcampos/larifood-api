@@ -74,8 +74,10 @@ export default class SimilarityRecipesController {
   }
 
   public similaridade(receita1: [], receita2: []) {
-    let todasPalavras = [...new Set([...receita1, ...receita2])]
-    // console.log(todasPalavras)
+    let receitaAtualizada1 = this.nlp(receita1)
+    let receitaAtualizada2 = this.nlp(receita2)
+
+    let todasPalavras = [...new Set([...receitaAtualizada1, ...receitaAtualizada2])]
 
     let vetor1: number[] = []
     let vetor2: number[] = []
@@ -97,5 +99,97 @@ export default class SimilarityRecipesController {
     // console.log(vetor2)
 
     return this.calculaSimilaridade(vetor1, vetor2)
+  }
+
+  public nlp(receita: string[]) {
+    var snowball = require('node-snowball')
+    let receitaAtualizada: string[] = []
+    for (var ingrediente of receita) {
+      // LOWERCASE
+      let ingredienteAtualizado = ingrediente.toLowerCase()
+      // PUNCTUATION REMOVAL
+      for (var pontuacao of [
+        '‘',
+        '!',
+        '”',
+        '#',
+        '$',
+        '%',
+        '&',
+        "'",
+        '(',
+        ')',
+        '*',
+        '+',
+        ',',
+        '-',
+        '.',
+        ',',
+        '/',
+        ':',
+        ';',
+        '?',
+        '@',
+        '[',
+        '\\',
+        ']',
+        '^',
+        '_',
+        '`',
+        '{',
+        '|',
+        '}',
+        '~',
+        '’',
+        ']',
+      ]) {
+        if (ingredienteAtualizado.includes(pontuacao)) {
+          ingredienteAtualizado = ingredienteAtualizado.replace(pontuacao, '')
+        }
+      }
+
+      // STOP WORD REMOVAL
+      for (var stopWord of ['de', 'DE', 'De']) {
+        if (ingredienteAtualizado.includes(stopWord)) {
+          ingredienteAtualizado = ingredienteAtualizado.replace(stopWord, '')
+        }
+      }
+
+      // ACENTOS
+      for (var char of ingredienteAtualizado) {
+        if (char.toLowerCase() === 'ç') {
+          ingredienteAtualizado = ingredienteAtualizado.replace(char, 'c')
+        }
+        if (
+          char.toLowerCase() === 'á' ||
+          char.toLowerCase() === 'â' ||
+          char.toLowerCase() === 'à' ||
+          char.toLowerCase() === 'ã'
+        ) {
+          ingredienteAtualizado = ingredienteAtualizado.replace(char, 'a')
+        }
+        if (char.toLowerCase() === 'é' || char.toLowerCase() === 'ê') {
+          ingredienteAtualizado = ingredienteAtualizado.replace(char, 'e')
+        }
+        if (char.toLowerCase() === 'í' || char.toLowerCase() === 'î') {
+          ingredienteAtualizado = ingredienteAtualizado.replace(char, 'i')
+        }
+        if (char.toLowerCase() === 'ó' || char.toLowerCase() === 'ô') {
+          ingredienteAtualizado = ingredienteAtualizado.replace(char, 'o')
+        }
+        if (char.toLowerCase() === 'ú' || char.toLowerCase() === 'û') {
+          ingredienteAtualizado = ingredienteAtualizado.replace(char, 'u')
+        }
+      }
+
+      // STEMMING
+      ingredienteAtualizado = snowball.stemword(ingredienteAtualizado, 'portuguese')
+
+      // TRIM
+      ingredienteAtualizado = ingredienteAtualizado.trim()
+
+      receitaAtualizada.push(ingredienteAtualizado)
+    }
+    return receitaAtualizada
   }
 }
