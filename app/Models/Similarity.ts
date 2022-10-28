@@ -1,13 +1,4 @@
-import {
-  BaseModel,
-  BelongsTo,
-  belongsTo,
-  column,
-  HasOne,
-  hasOne,
-  ManyToMany,
-  manyToMany,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Recipe from './Recipe'
 
 export default class Similarity extends BaseModel {

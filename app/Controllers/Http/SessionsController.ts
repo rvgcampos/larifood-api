@@ -8,7 +8,7 @@ export default class SessionsController {
       expiresIn: '9hours',
     })
 
-    const user = User.query().where('id', auth.user!.id).preload('avatar')
+    User.query().where('id', auth.user!.id).preload('avatar')
 
     return response.created({ user: auth.user, token })
   }

@@ -1,4 +1,3 @@
-import UsersLike from 'App/Models/UsersLike'
 import { DateTime } from 'luxon'
 import {
   BaseModel,
@@ -8,7 +7,6 @@ import {
   hasMany,
   manyToMany,
   ManyToMany,
-  computed,
   hasOne,
   HasOne,
 } from '@ioc:Adonis/Lucid/Orm'

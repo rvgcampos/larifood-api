@@ -5,7 +5,6 @@ import User from 'App/Models/User'
 import { ApiClient } from '@japa/api-client'
 import { CategoryFactory, PrepareTimeUnitFactory, UserFactory } from 'Database/factories'
 
-const util = require('util')
 let token = ''
 let user = {} as User
 
@@ -201,7 +200,7 @@ test.group('Recipes', (group) => {
         },
       ],
     }
-    const recipe1 = await client.post('/recipes').json(recipePayload)
+    await client.post('/recipes').json(recipePayload)
 
     const recipePayload2 = {
       name: 'Brownie Diferenciado',

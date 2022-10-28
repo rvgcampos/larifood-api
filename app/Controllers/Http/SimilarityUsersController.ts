@@ -1,7 +1,5 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Recipe from 'App/Models/Recipe'
-import Similarity from 'App/Models/Similarity'
 import SimilaritiesUser from 'App/Models/SimilaritiesUser'
 import User from 'App/Models/User'
 
@@ -131,6 +129,8 @@ export default class SimilarityUsersController {
     let vetor1: number[] = []
     let vetor2: number[] = []
     for (const i in todasPalavras) {
+      console.log(i)
+
       vetor1.push(0)
       vetor2.push(0)
     }

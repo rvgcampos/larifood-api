@@ -1,5 +1,4 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Recipe from 'App/Models/Recipe'
 import Similarity from 'App/Models/Similarity'
 
 export default class SimilarityController {

@@ -1,7 +1,6 @@
 import { UserFactory } from './../../../database/factories/index'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
-import Hash from '@ioc:Adonis/Core/Hash'
 import { ApiClient } from '@japa/api-client'
 import User from 'App/Models/User'
 
@@ -13,7 +12,7 @@ test.group('User', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('it should follow an user', async ({ assert, client }) => {
+  test('it should follow an user', async ({ client }) => {
     const newUser = await UserFactory.create()
 
     await client
@@ -29,7 +28,7 @@ test.group('User', (group) => {
     console.log(register)
   })
 
-  test('it should unfollow an user', async ({ assert, client }) => {
+  test('it should unfollow an user', async ({ client }) => {
     const newUser = await UserFactory.create()
 
     await client

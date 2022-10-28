@@ -18,7 +18,7 @@ test.group('Feed', (group) => {
     return () => Database.rollbackGlobalTransaction('sqlite')
   })
 
-  test('it should show recipes from the recommendative users', async ({ assert, client }) => {
+  test('it should show recipes from the recommendative users', async ({ client }) => {
     const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
     const prepareTimeUnit2 = await PrepareTimeUnitFactory.create()
     const category1 = await CategoryFactory.create()
@@ -149,6 +149,7 @@ test.group('Feed', (group) => {
       .json({ email: newUser.email, password: plainPassword })
     token = response.body().token.token
     user = newUser
+    console.log(user.id)
   })
 
   group.teardown(async () => {

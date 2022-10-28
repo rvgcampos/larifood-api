@@ -4,7 +4,6 @@ import Ingredient from 'App/Models/Ingredient'
 import PrepareMode from 'App/Models/PrepareMode'
 import Recipe from 'App/Models/Recipe'
 import CreateRecipeValidator from 'App/Validators/CreateRecipeValidator'
-import Application from '@ioc:Adonis/Core/Application'
 
 export default class RecipesController {
   public async show({ request, response }: HttpContextContract) {
@@ -53,7 +52,7 @@ export default class RecipesController {
     return response.created({ recipe, ingredients, prepareModes })
   }
 
-  public async update({ request, response, auth, params }: HttpContextContract) {
+  public async update({ request, response, params }: HttpContextContract) {
     const id = request.param('id')
     const payload = await request.all()
     let recipe = await Recipe.findOrFail(params.id)
@@ -87,7 +86,7 @@ export default class RecipesController {
     return response.ok({ recipe })
   }
 
-  public async destroy({ response, auth, params }: HttpContextContract) {
+  public async destroy({ response, params }: HttpContextContract) {
     const recipe = await Recipe.findOrFail(params.id)
 
     await recipe.delete()

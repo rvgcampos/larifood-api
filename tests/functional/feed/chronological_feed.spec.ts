@@ -18,7 +18,7 @@ test.group('Feed', (group) => {
     return () => Database.rollbackGlobalTransaction('sqlite')
   })
 
-  test('it should show recipes from followed users', async ({ assert, client }) => {
+  test('it should show recipes from followed users', async ({ client }) => {
     const prepareTimeUnit1 = await PrepareTimeUnitFactory.create()
     const prepareTimeUnit2 = await PrepareTimeUnitFactory.create()
     const category1 = await CategoryFactory.create()

@@ -59,7 +59,7 @@ test.group('User', (group) => {
     })
     await client.post('/recipes').json({ ...recipePayload1, name: 'Frango' })
 
-    const response = await client.get('/similarity-recipes')
+    await client.get('/similarity-recipes')
     // console.log(JSON.stringify(response.body(), null, 4))
   }).pin()
 

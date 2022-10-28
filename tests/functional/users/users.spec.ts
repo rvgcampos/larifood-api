@@ -182,7 +182,7 @@ test.group('User', (group) => {
   })
 
   // ROTA: ME
-  test('it should return informations about an user', async ({ assert, client }) => {
+  test('it should return informations about an user', async ({ client }) => {
     const prepareTimeUnit = await PrepareTimeUnitFactory.create()
     const category = await CategoryFactory.create()
     const qtdUnit = await QtdUnitFactory.create()

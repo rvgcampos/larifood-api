@@ -81,7 +81,10 @@ export default class SimilarityRecipesController {
 
     let vetor1: number[] = []
     let vetor2: number[] = []
-    for (const i in todasPalavras) {
+
+    for (let i in todasPalavras) {
+      console.log(i)
+      // i += 'a'
       vetor1.push(0)
       vetor2.push(0)
     }

@@ -28,14 +28,14 @@ export default class AvatarController {
     return avatar
   }
 
-  public async addPostPhoto({ request, auth }: HttpContextContract) {
+  public async addPostPhoto({ request }: HttpContextContract) {
     const { file, idRecipe } = await request.validate(AddPhotoRecipeValidator)
     console.log(file)
     console.log(typeof file)
     console.log(idRecipe)
     console.log(typeof idRecipe)
 
-    const trx = await Database.transaction()
+    await Database.transaction()
 
     const recipe = await Recipe.findOrFail(Number(idRecipe))
 
@@ -55,7 +55,7 @@ export default class AvatarController {
     return avatar
   }
 
-  public async destroy({ request, response, auth }: HttpContextContract) {
+  public async destroy({ auth }: HttpContextContract) {
     await Database.transaction(async (trx) => {
       const user = auth.user!.useTransaction(trx)
 

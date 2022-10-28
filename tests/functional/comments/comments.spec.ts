@@ -1,10 +1,4 @@
-import {
-  CommentFactory,
-  IngredientFactory,
-  PrepareModeFactory,
-  QtdUnitFactory,
-  RecipeFactory,
-} from './../../../database/factories/index'
+import { CommentFactory, RecipeFactory } from './../../../database/factories/index'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
 import User from 'App/Models/User'

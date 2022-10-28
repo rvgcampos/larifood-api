@@ -3,7 +3,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import User from 'App/Models/User'
 
 export default class ProfilesController {
-  public async show({ request, response, auth }: HttpContextContract) {
+  public async show({ request, auth }: HttpContextContract) {
     const { username } = request.qs()
 
     const user = await User.query()

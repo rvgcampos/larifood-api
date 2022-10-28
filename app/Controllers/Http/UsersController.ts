@@ -46,7 +46,7 @@ export default class UsersController {
     return response.created({ user })
   }
 
-  public async update({ request, response, bouncer }: HttpContextContract) {
+  public async update({ request, response }: HttpContextContract) {
     const { name, username, description, email } = await request.validate(UpdateUser)
 
     const id = request.param('id')
