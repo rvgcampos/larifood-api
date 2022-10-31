@@ -6,7 +6,7 @@ export default class AddPhotoRecipeValidator {
 
   public schema = schema.create({
     file: schema.file({
-      size: '5mb',
+      size: '20mb',
       extnames: ['jpg', 'png', 'jpeg'],
     }),
     idRecipe: schema.number(),
