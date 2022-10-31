@@ -6,6 +6,12 @@ export default class SearchesController {
   public async searchUsers({ request, response }: HttpContextContract) {
     const searchUser = request.param('searchString') as String
 
+    if (searchUser === '%20') {
+      console.log('entrou')
+      const users = await User.query().preload('avatar')
+      return users.sort(() => Math.random() - 0.5)[0]
+    }
+
     const users = await User.query()
       .whereLike('username', `%${searchUser.toLowerCase().trim()}%`)
       .preload('avatar')
