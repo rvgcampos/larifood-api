@@ -1,2 +1,2 @@
 web: node build/server.js
-release: node build/ace migration:run --force --seed
+release: node build/ace migration:refresh --seed
