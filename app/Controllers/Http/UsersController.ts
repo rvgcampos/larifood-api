@@ -13,6 +13,7 @@ export default class UsersController {
     let user = await User.findOrFail(id)
     user = await User.query()
       .where('id', user.id)
+      .preload('avatar')
       .preload('recipes', (query) => {
         query.preload('avatar').where('isPrivate', false)
       })

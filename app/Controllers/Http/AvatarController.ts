@@ -10,7 +10,11 @@ export default class AvatarController {
   public async update({ request, auth }: HttpContextContract) {
     const { file } = await request.validate(UpdateValidator)
 
+    console.log('Entrou aquiiiiii')
+
     const user = auth.user!
+
+    console.log(user.id)
 
     const searchPayload = {}
     const savePayload = {
@@ -18,7 +22,13 @@ export default class AvatarController {
       fileName: `${user.username}-${new Date().getTime()}.${file.extname}`,
     }
 
-    const avatar = await user.related('avatar').firstOrCreate(searchPayload, savePayload)
+    console.log(savePayload)
+
+    const avatar = await user
+      .related('avatar')
+      .firstOrCreate({ ownerId: user.id, fileCategory: 'avatar' }, savePayload)
+
+    console.log(avatar)
 
     await file.move(Application.tmpPath('uploads-file'), {
       name: avatar.fileName,
@@ -39,13 +49,15 @@ export default class AvatarController {
 
     const recipe = await Recipe.findOrFail(Number(idRecipe))
 
-    const searchPayload = {}
+    // const searchPayload = { ownerId: recipe.id, fileCategory: 'post' }
     const savePayload = {
       fileCategory: 'post' as any,
       fileName: `${idRecipe}-${new Date().getTime()}.${file.extname}`,
     }
 
-    const avatar = await recipe.related('avatar').firstOrCreate(searchPayload, savePayload)
+    const avatar = await recipe
+      .related('avatar')
+      .firstOrCreate({ ownerId: recipe.id, fileCategory: 'post' }, savePayload)
 
     await file.move(Application.tmpPath('recipes-file'), {
       name: avatar.fileName,

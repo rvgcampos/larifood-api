@@ -1,3 +1,4 @@
+import Database from '@ioc:Adonis/Lucid/Database'
 import Recipe from 'App/Models/Recipe'
 import User from 'App/Models/User'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
@@ -34,10 +35,11 @@ export default class SearchesController {
     const { ingredients } = request.all()
     console.log(ingredients)
 
-    let recipes = await Recipe.query().preload('ingredients', (query) => {
-      query.whereIn('name', ingredients)
-    })
-    console.log(recipes.length)
+    let recipes = await Recipe.query()
+      .preload('ingredients', (query) => {
+        query.whereIn('name', ingredients)
+      })
+      .preload('avatar')
 
     recipes = recipes.filter((value) => {
       return value.ingredients.length === Number(ingredients.length)
